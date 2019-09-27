@@ -24,14 +24,8 @@ import (
 // }
 func main()  {
 	
-	dealer, err := zmq.NewSocket(zmq.DEALER)
-	
-	if err != nil{
-		log.Fatal("Error Dealer:", err)
-	}
-	defer dealer.Close()
-	dealer.Connect("tcp://*:30802")
-	
+	backend := CreateBackend(7, "tcp://127.0.0.1:30802")
+	defer backend.Destory()
 	//addr := new 
 	listener, err := net.Listen("tcp", "localhost:30801")
 	if err != nil{
@@ -39,7 +33,7 @@ func main()  {
 		return
 	}
 	defer listener.Close()
-	go HandleDealer(dealer)
+	go HandleBackend(backend)
 
 	for{
 		conn, err := listener.Accept()
@@ -52,20 +46,13 @@ func main()  {
 
 }
 
-func HandleDealer(dealer *zmq.Socket){
+func HandleBackend(backend *Backend){
 	for{
-		replyHead, err := dealer.RecvBytes(0)
-		if err != nil {
-			log.Fatal(err)
-		}
-		log.Printf("dealer received head '%s'", string(replyHead[0]))
-		ssHead := &gw_ss.Head{}
-		proto.Unmarshal(replyHead, ssHead)
-		more, err := dealer.GetRcvmore()
+		head, bodyBuf, err = backend.RecvHeadMsg()
 		if err != nil{
 			log.Fatal(err)
 		}
-		if more {
+		if bodyBuf != nil {
 			replyBody, err := dealer.RecvBytes(0)
 			if err != nil {
 				log.Fatal(err)
@@ -98,8 +85,9 @@ func HandleDealer(dealer *zmq.Socket){
 
 
 // MATCH /unexported method HandleConn 
-func HandleConn(conn net.Conn){
+func HandleConn(conn net.Conn, dealer *zmq.Socket){
 	defer conn.Close()
+	dealer.
 	lenBuf := make([]byte, 4)
 	for{
 		len, err := conn.Read(lenBuf)
