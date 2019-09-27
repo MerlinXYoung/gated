@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package gw.cs;
+
+enum EMsgID
+{
+    Invalid =0;
+    Auth = 1;
+    Other = 0x1000;
+}
+
+//head_size(uint16_t)+Head+Body
+
+message Head 
+{
+    EMsgID msgid = 1 ;
+    uint32 seq = 2;
+    uint32 down_seq = 3; 
+    int32 result = 4;
+}
+
+message AuthReq
+{
+    string openid = 1;
+    string openkey = 2;
+}
+
+message AuthRes
+{
+    uint64 uid = 1;
+}
+

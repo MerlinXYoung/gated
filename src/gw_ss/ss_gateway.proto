@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package gw.ss;
+
+enum EMsgID
+{
+    Invalid = 0;
+    ClientNew = 1;
+    ClientAuth = 2;
+    ClientClose = 3;
+
+    Other= 0x1000;
+}
+message Head 
+{
+    EMsgID msgid = 1;
+    uint32 client_id = 2;
+    uint64 uid = 3;
+}
+message ClientNewReq
+{
+}
+
+message ClientNewRes
+{
+    bool close = 1 ;
+}
+
+message ClientAuthReq
+{
+    string openid = 1;
+    string openkey = 2;
+}
+
+message ClientAuthRes
+{
+    bool close = 1 ;
+}
+
+message ClientCloseReq
+{
+    
+}
+
+message ClientCloseRes
+{
+
+}
